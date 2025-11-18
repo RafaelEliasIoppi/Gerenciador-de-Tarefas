@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Gerenciador de Tarefas</title>
+  <link rel="stylesheet" href="https://unpkg.com/mvp.css"/>
+  <style>
+    body { max-width: 900px; margin: auto; }
+    header { text-align: center; margin-bottom: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; text-align: center; }
+    th { background: #f0f0f0; }
+    .concluida { color: green; font-weight: bold; }
+    .pendente { color: red; font-weight: bold; }
+    .mensagem { margin: 10px 0; padding: 8px; border-radius: 4px; }
+    .sucesso { background: #d4edda; color: #155724; }
+    .erro { background: #f8d7da; color: #721c24; }
+    .acoes button { margin: 0 5px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>✅ Gerenciador de Tarefas</h1>
+
+  <!-- Mensagens -->
+  <div th:if="${sucesso}" class="mensagem sucesso" th:text="${sucesso}"></div>
+  <div th:if="${erro}" class="mensagem erro" th:text="${erro}"></div>
+
+  <!-- Estatísticas -->
+  <p>
+    Total: <strong th:text="${total}"></strong> |
+    Concluídas: <strong th:text="${concluidas}"></strong> |
+    Pendentes: <strong th:text="${pendentes}"></strong>
+  </p>
+
+  <!-- Formulário -->
+  <form method="post" action="/tarefas">
+    <input type="text" name="descricao" placeholder="Nova tarefa" required>
+    <input type="date" name="prazo">
+    <select name="prioridade">
+      <option value="BAIXA">Baixa</option>
+      <option value="MEDIA" selected>Média</option>
+      <option value="ALTA">Alta</option>
+    </select>
+    <button type="submit">Adicionar</button>
+  </form>
+</header>
+
+<main>
+  <table>
+    <thead>
+      <tr>
+        <th>Descrição</th>
+        <th>Status</th>
+        <th>Prazo</th>
+        <th>Prioridade</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="t : ${tarefas}">
+        <td th:text="${t.descricao}" th:classappend="${t.concluida} ? 'concluida' : 'pendente'"></td>
+        <td th:text="${t.concluida ? '✔ Concluída' : '❌ Pendente'}"></td>
+        <td th:text="${t.prazo}"></td>
+        <td th:text="${t.prioridade}"></td>
+        <td class="acoes">
+          <form th:action="@{'/tarefas/' + ${t.id} + '/toggle'}" method="post" style="display:inline">
+            <button type="submit" th:text="${t.concluida ? 'Reabrir' : 'Concluir'}"></button>
+          </form>
+          <form th:action="@{'/tarefas/' + ${t.id} + '/remover'}" method="post" style="display:inline">
+            <button type="submit">Remover</button>
+          </form>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</main>
+</body>
+</html>
